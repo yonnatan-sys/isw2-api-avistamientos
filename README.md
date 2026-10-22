@@ -5,7 +5,7 @@ Python + Flask, datos en SQLite (archivo `avistamientos.db`, se crea solo), inte
 
 ## Instalación y ejecución
 
-Requiere Python 3.9+.
+Requiere Python 3.10+.
 
 ```bash
 git clone https://github.com/yonnatan-sys/isw2-api-avistamientos.git
@@ -34,7 +34,11 @@ python seed.py --reiniciar  # borra todo y recarga los ejemplos
 { "id": 1, "especie": "colibrí", "lugar": "Jardín Botánico", "fecha": "2026-09-20", "observador": "Yonnatan" }
 ```
 
-`id` lo asigna el sistema. `fecha` en formato `AAAA-MM-DD`. Todos los demás campos son obligatorios.
+`id` lo asigna el sistema. Reglas de validación:
+
+- `especie`: entre 3 y 50 caracteres (sin contar espacios al inicio y al final).
+- `fecha`: formato `AAAA-MM-DD`, existente y no posterior a hoy.
+- `lugar` y `observador`: obligatorios, no vacíos.
 
 ## Endpoints
 
@@ -42,10 +46,12 @@ python seed.py --reiniciar  # borra todo y recarga los ejemplos
 |---|---|
 | `GET /avistamientos` | 200 con la lista |
 | `GET /avistamientos/{id}` | 200, o 404 si no existe |
-| `POST /avistamientos` | 201 con el creado, o 400 si faltan datos |
+| `POST /avistamientos` | 201 con el creado, o 400 si los datos son inválidos |
 | `PUT /avistamientos/{id}` | 200, 404 si no existe, 400 si los datos son inválidos |
 | `DELETE /avistamientos/{id}` | 204, o 404 si no existe |
 | `GET /avistamientos/resumen` | 200 con el conteo por especie (bonus) |
+
+Los errores 400 incluyen un mensaje que indica qué campo falló.
 
 ### Ejemplos con curl
 
@@ -79,20 +85,38 @@ curl -i -X POST http://127.0.0.1:5000/avistamientos \
 
 > En Windows CMD usa comillas dobles escapadas o PowerShell/Git Bash para los `-d`.
 
-## Pruebas (bonus)
+## Pruebas
+
+Las pruebas están en la carpeta `test/`: `test_validador.py` (unitarias, sin Flask ni base de datos) y `test_app.py` (integración por HTTP contra una base SQLite temporal).
+
+Correr las pruebas:
 
 ```bash
 pytest -v
 ```
 
+Generar el reporte de cobertura (sentencias y ramas):
+
+```bash
+pytest --cov=app --cov=validador --cov-branch --cov-report=term-missing
+```
+
+Para generar un reporte HTML en `htmlcov/`, cambia la última opción por `--cov-report=html`.
+
 ## Estructura del proyecto
 
 ```
 app.py            # API (Flask + SQLite)
+validador.py      # Validación del avistamiento y interfaz Reloj
 seed.py           # Datos de ejemplo (opcional)
-test_app.py       # Pruebas con pytest
+pytest.ini        # Configuración de pytest
+test/
+  test_app.py       # Pruebas de integración (HTTP)
+  test_validador.py # Pruebas unitarias del validador
+docs/
+  justificacion-pruebas.md  # Justificación de las decisiones de pruebas
 requirements.txt  # Dependencias
-.gitignore        # Excluye la base de datos, caché y entorno virtual
+.gitignore        # Excluye la base de datos, caché, cobertura y entorno virtual
 README.md
 ```
 

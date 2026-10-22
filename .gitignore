@@ -1,4 +1,16 @@
-__pycache__/
+# Entorno virtual
 .venv/
-*.db
+venv/
+
+# Python
+__pycache__/
+*.pyc
+
+# Pruebas y cobertura
 .pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Base de datos local
+*.db

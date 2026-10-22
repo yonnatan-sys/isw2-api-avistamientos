@@ -73,3 +73,14 @@ def test_resumen(client):
     r = client.get("/avistamientos/resumen")
     assert r.status_code == 200
     assert r.get_json() == [{"especie": "colibrí", "total": 2}, {"especie": "águila", "total": 1}]
+
+def test_ruta_inexistente_devuelve_404_json(client):
+    r = client.get("/no-existe")
+    assert r.status_code == 404
+    assert r.get_json() == {"error": "Ruta no encontrada"}
+
+
+def test_metodo_no_permitido_devuelve_405_json(client):
+    r = client.patch("/avistamientos")
+    assert r.status_code == 405
+    assert r.get_json() == {"error": "Método no permitido"}

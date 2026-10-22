@@ -1,15 +1,15 @@
 import os
 import sqlite3
-from datetime import datetime
 
 from flask import Flask, g, jsonify, request
+from contextlib import closing
+from validador import CAMPOS, ValidadorDeAvistamiento
 
-CAMPOS = ("especie", "lugar", "fecha", "observador")
 
-
-def create_app(db_path=None):
+def create_app(db_path=None, reloj=None):
     app = Flask(__name__)
     app.config["DB_PATH"] = db_path or os.environ.get("DB_PATH", "avistamientos.db")
+    validador = ValidadorDeAvistamiento(reloj)
 
     def get_db():
         if "db" not in g:
@@ -23,7 +23,7 @@ def create_app(db_path=None):
         if db is not None:
             db.close()
 
-    with sqlite3.connect(app.config["DB_PATH"]) as con:
+    with closing(sqlite3.connect(app.config["DB_PATH"])) as con:
         con.execute(
             """CREATE TABLE IF NOT EXISTS avistamientos (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -33,19 +33,7 @@ def create_app(db_path=None):
                 observador TEXT NOT NULL
             )"""
         )
-
-    def validar(datos):
-        """Devuelve mensaje de error o None si los datos son válidos."""
-        if not isinstance(datos, dict):
-            return "El cuerpo debe ser un objeto JSON"
-        faltan = [c for c in CAMPOS if not isinstance(datos.get(c), str) or not datos[c].strip()]
-        if faltan:
-            return f"Faltan o están vacíos: {', '.join(faltan)}"
-        try:
-            datetime.strptime(datos["fecha"], "%Y-%m-%d")
-        except ValueError:
-            return "fecha debe tener formato AAAA-MM-DD"
-        return None
+        con.commit()
 
     def buscar(id_):
         row = get_db().execute("SELECT * FROM avistamientos WHERE id = ?", (id_,)).fetchone()
@@ -73,7 +61,7 @@ def create_app(db_path=None):
     @app.post("/avistamientos")
     def crear():
         datos = request.get_json(silent=True)
-        error = validar(datos)
+        error = validador.validar(datos)
         if error:
             return jsonify({"error": error}), 400
         db = get_db()
@@ -89,7 +77,7 @@ def create_app(db_path=None):
         if buscar(id_) is None:
             return jsonify({"error": "Avistamiento no encontrado"}), 404
         datos = request.get_json(silent=True)
-        error = validar(datos)
+        error = validador.validar(datos)
         if error:
             return jsonify({"error": error}), 400
         db = get_db()
