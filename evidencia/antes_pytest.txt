@@ -1,0 +1,41 @@
+============================= test session starts =============================
+platform win32 -- Python 3.14.6, pytest-9.2.0, pluggy-1.7.0 -- C:\Users\aulainformatica\Downloads\Nueva carpeta\repo-clean\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\aulainformatica\Downloads\Nueva carpeta\repo-clean
+configfile: pytest.ini
+testpaths: test
+plugins: cov-7.1.0
+collecting ... collected 30 items
+
+test/test_app.py::test_lista_vacia PASSED                                [  3%]
+test/test_app.py::test_crear_y_obtener PASSED                            [  6%]
+test/test_app.py::test_crear_datos_faltantes PASSED                      [ 10%]
+test/test_app.py::test_crear_fecha_invalida PASSED                       [ 13%]
+test/test_app.py::test_crear_sin_json PASSED                             [ 16%]
+test/test_app.py::test_obtener_no_existe PASSED                          [ 20%]
+test/test_app.py::test_actualizar PASSED                                 [ 23%]
+test/test_app.py::test_actualizar_no_existe PASSED                       [ 26%]
+test/test_app.py::test_actualizar_datos_invalidos PASSED                 [ 30%]
+test/test_app.py::test_eliminar PASSED                                   [ 33%]
+test/test_app.py::test_eliminar_no_existe PASSED                         [ 36%]
+test/test_app.py::test_resumen PASSED                                    [ 40%]
+test/test_app.py::test_ruta_inexistente_devuelve_404_json PASSED         [ 43%]
+test/test_app.py::test_metodo_no_permitido_devuelve_405_json PASSED      [ 46%]
+test/test_validador.py::test_especie_de_2_caracteres_es_invalida PASSED  [ 50%]
+test/test_validador.py::test_especie_de_3_caracteres_es_valida PASSED    [ 53%]
+test/test_validador.py::test_especie_de_50_caracteres_es_valida PASSED   [ 56%]
+test/test_validador.py::test_especie_de_51_caracteres_es_invalida PASSED [ 60%]
+test/test_validador.py::test_especie_con_espacios_cuenta_sin_ellos PASSED [ 63%]
+test/test_validador.py::test_especie_solo_espacios_es_invalida PASSED    [ 66%]
+test/test_validador.py::test_fecha_de_hoy_es_valida PASSED               [ 70%]
+test/test_validador.py::test_fecha_de_manana_es_invalida PASSED          [ 73%]
+test/test_validador.py::test_fecha_de_ayer_es_valida PASSED              [ 76%]
+test/test_validador.py::test_fecha_con_barras_es_invalida PASSED         [ 80%]
+test/test_validador.py::test_fecha_sin_ceros_a_la_izquierda_es_invalida PASSED [ 83%]
+test/test_validador.py::test_fecha_imposible_es_invalida PASSED          [ 86%]
+test/test_validador.py::test_cuerpo_que_no_es_objeto_es_invalido PASSED  [ 90%]
+test/test_validador.py::test_campo_faltante_se_reporta_por_nombre PASSED [ 93%]
+test/test_validador.py::test_lugar_solo_espacios_se_reporta PASSED       [ 96%]
+test/test_validador.py::test_datos_completos_y_validos_no_tienen_error PASSED [100%]
+
+============================= 30 passed in 0.60s ==============================

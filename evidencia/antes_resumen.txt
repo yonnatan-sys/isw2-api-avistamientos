@@ -1,0 +1,8 @@
+HTTP/1.1 200 OK
+Server: Werkzeug/3.1.9 Python/3.14.6
+Date: Thu, 12 Nov 2026 01:32:22 GMT
+Content-Type: application/json
+Content-Length: 361
+Connection: close
+
+[{"especie":"colibr\u00ed","total":5},{"especie":"garza","total":3},{"especie":"mirla","total":3},{"especie":"\u00e1guila","total":3},{"especie":"c\u00f3ndor andino","total":2},{"especie":"tuc\u00e1n","total":2},{"especie":"carpintero","total":1},{"especie":"guacamaya","total":1},{"especie":"loro orejiamarillo","total":1},{"especie":"pato andino","total":1}]

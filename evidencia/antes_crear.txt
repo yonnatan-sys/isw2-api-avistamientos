@@ -1,0 +1,8 @@
+HTTP/1.1 201 CREATED
+Server: Werkzeug/3.1.9 Python/3.14.6
+Date: Thu, 12 Nov 2026 01:32:40 GMT
+Content-Type: application/json
+Content-Length: 102
+Connection: close
+
+{"especie":"colibr\u00ed","fecha":"2026-09-20","id":23,"lugar":"Jard\u00edn","observador":"Yonnatan"}
