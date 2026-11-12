@@ -2,7 +2,7 @@
 
 Ingeniería de Software 2 (ISW-2). Trabajo individual sobre la API de avistamientos de aves.
 
-**Repositorio:** https://github.com/yonnatan-sys/isw2-api-avistamientos
+**Repositorio:** https://github.com/yonnatan-sys/isw2-api-avistamientos/tree/clean-architecture
 **Rama:** `clean-architecture`
 
 ---
