@@ -3,7 +3,7 @@ import sqlite3
 
 from flask import Flask, g, jsonify, request
 from contextlib import closing
-from validador import CAMPOS, ValidadorDeAvistamiento
+from dominio.validador import CAMPOS, ValidadorDeAvistamiento
 
 
 def create_app(db_path=None, reloj=None):

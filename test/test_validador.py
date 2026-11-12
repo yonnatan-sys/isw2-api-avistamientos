@@ -2,7 +2,7 @@ from datetime import date, timedelta
 
 import pytest
 
-from validador import RelojFijo, ValidadorDeAvistamiento
+from dominio.validador import RelojFijo, ValidadorDeAvistamiento
 
 HOY = date(2026, 10, 21)
 
