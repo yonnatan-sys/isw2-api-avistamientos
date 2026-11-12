@@ -113,13 +113,6 @@ flowchart LR
 | `dominio/validador.py` | ninguno | Dominio |
 | `infraestructura/repositorio_sqlite.py` | `aplicacion.puertos`, `dominio.validador` (y `sqlite3`) | Adaptador de salida |
 
-Verifiqué las dependencias con búsquedas de texto sobre los archivos del proyecto:
-
-- `aplicacion/` y `dominio/` no contienen `flask` ni `sqlite3`.
-- `sqlite3` aparece solo en `infraestructura/repositorio_sqlite.py`.
-- `aplicacion/puertos.py` no importa nada del proyecto.
-
-La única dependencia que cruza hacia un adaptador es `app.py` → `infraestructura`, en el punto de composición (`create_app`). Está en la capa más externa, así que no rompe la regla. Lo que sí la rompería sería que `aplicacion` o `dominio` importaran de `infraestructura`, y no lo hacen.
 
 ### 2.4 Commits
 
