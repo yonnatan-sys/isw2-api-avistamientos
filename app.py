@@ -1,104 +1,59 @@
 import os
-import sqlite3
 
-from flask import Flask, g, jsonify, request
-from contextlib import closing
-from dominio.validador import CAMPOS, ValidadorDeAvistamiento
+from flask import Flask, jsonify, request
+
+from aplicacion.excepciones import AvistamientoNoEncontrado, DatosInvalidos
+from aplicacion.servicio_avistamientos import ServicioAvistamientos
+from dominio.validador import ValidadorDeAvistamiento
+from infraestructura.repositorio_sqlite import RepositorioSQLite
 
 
 def create_app(db_path=None, reloj=None):
     app = Flask(__name__)
-    app.config["DB_PATH"] = db_path or os.environ.get("DB_PATH", "avistamientos.db")
-    validador = ValidadorDeAvistamiento(reloj)
+    ruta = db_path or os.environ.get("DB_PATH", "avistamientos.db")
+    app.config["DB_PATH"] = ruta
 
-    def get_db():
-        if "db" not in g:
-            g.db = sqlite3.connect(app.config["DB_PATH"])
-            g.db.row_factory = sqlite3.Row
-        return g.db
+    # Composición: aquí se decide qué adaptador concreto usar
+    servicio = ServicioAvistamientos(
+        RepositorioSQLite(ruta),
+        ValidadorDeAvistamiento(reloj),
+    )
 
-    @app.teardown_appcontext
-    def close_db(_exc):
-        db = g.pop("db", None)
-        if db is not None:
-            db.close()
+    @app.errorhandler(AvistamientoNoEncontrado)
+    def _no_encontrado(_e):
+        return jsonify({"error": "Avistamiento no encontrado"}), 404
 
-    with closing(sqlite3.connect(app.config["DB_PATH"])) as con:
-        con.execute(
-            """CREATE TABLE IF NOT EXISTS avistamientos (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                especie TEXT NOT NULL,
-                lugar TEXT NOT NULL,
-                fecha TEXT NOT NULL,
-                observador TEXT NOT NULL
-            )"""
-        )
-        con.commit()
-
-    def buscar(id_):
-        row = get_db().execute("SELECT * FROM avistamientos WHERE id = ?", (id_,)).fetchone()
-        return dict(row) if row else None
+    @app.errorhandler(DatosInvalidos)
+    def _datos_invalidos(e):
+        return jsonify({"error": e.mensaje}), 400
 
     @app.get("/avistamientos")
     def listar():
-        rows = get_db().execute("SELECT * FROM avistamientos ORDER BY id").fetchall()
-        return jsonify([dict(r) for r in rows]), 200
+        return jsonify(servicio.listar()), 200
 
     @app.get("/avistamientos/resumen")
     def resumen():
-        rows = get_db().execute(
-            "SELECT especie, COUNT(*) AS total FROM avistamientos GROUP BY especie ORDER BY total DESC, especie"
-        ).fetchall()
-        return jsonify([dict(r) for r in rows]), 200
+        return jsonify(servicio.resumen()), 200
 
     @app.get("/avistamientos/<int:id_>")
     def obtener(id_):
-        av = buscar(id_)
-        if av is None:
-            return jsonify({"error": "Avistamiento no encontrado"}), 404
-        return jsonify(av), 200
+        return jsonify(servicio.obtener(id_)), 200
 
     @app.post("/avistamientos")
     def crear():
-        datos = request.get_json(silent=True)
-        error = validador.validar(datos)
-        if error:
-            return jsonify({"error": error}), 400
-        db = get_db()
-        cur = db.execute(
-            "INSERT INTO avistamientos (especie, lugar, fecha, observador) VALUES (?, ?, ?, ?)",
-            tuple(datos[c].strip() for c in CAMPOS),
-        )
-        db.commit()
-        return jsonify(buscar(cur.lastrowid)), 201
+        return jsonify(servicio.crear(request.get_json(silent=True))), 201
 
     @app.put("/avistamientos/<int:id_>")
     def actualizar(id_):
-        if buscar(id_) is None:
-            return jsonify({"error": "Avistamiento no encontrado"}), 404
-        datos = request.get_json(silent=True)
-        error = validador.validar(datos)
-        if error:
-            return jsonify({"error": error}), 400
-        db = get_db()
-        db.execute(
-            "UPDATE avistamientos SET especie=?, lugar=?, fecha=?, observador=? WHERE id=?",
-            (*(datos[c].strip() for c in CAMPOS), id_),
-        )
-        db.commit()
-        return jsonify(buscar(id_)), 200
+        return jsonify(servicio.actualizar(id_, request.get_json(silent=True))), 200
 
     @app.delete("/avistamientos/<int:id_>")
     def eliminar(id_):
-        if buscar(id_) is None:
-            return jsonify({"error": "Avistamiento no encontrado"}), 404
-        db = get_db()
-        db.execute("DELETE FROM avistamientos WHERE id = ?", (id_,))
-        db.commit()
+        servicio.eliminar(id_)
         return "", 204
 
     @app.errorhandler(404)
-    def no_encontrado(_e):
+    def no_encontrado_ruta(_e):
         return jsonify({"error": "Ruta no encontrada"}), 404
 
     @app.errorhandler(405)
