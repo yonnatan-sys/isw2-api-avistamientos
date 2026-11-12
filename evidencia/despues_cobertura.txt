@@ -1,0 +1,28 @@
+============================= test session starts =============================
+platform win32 -- Python 3.14.6, pytest-9.2.0, pluggy-1.7.0
+rootdir: C:\Users\aulainformatica\Downloads\Nueva carpeta\repo-clean
+configfile: pytest.ini
+testpaths: test
+plugins: cov-7.1.0
+collected 30 items
+
+test\test_app.py ..............                                          [ 46%]
+test\test_validador.py ................                                  [100%]
+
+=============================== tests coverage ================================
+_______________ coverage: platform win32, python 3.14.6-final-0 _______________
+
+Name                                    Stmts   Miss Branch BrPart  Cover   Missing
+-----------------------------------------------------------------------------------
+aplicacion\__init__.py                      0      0      0      0   100%
+aplicacion\excepciones.py                   6      0      0      0   100%
+aplicacion\puertos.py                       2      0      0      0   100%
+aplicacion\servicio_avistamientos.py       32      0      4      0   100%
+app.py                                     45      1      2      1    96%   67
+dominio\__init__.py                         0      0      0      0   100%
+dominio\validador.py                       38      1     10      0    98%   11
+infraestructura\__init__.py                 0      0      0      0   100%
+infraestructura\repositorio_sqlite.py      42      0      0      0   100%
+-----------------------------------------------------------------------------------
+TOTAL                                     165      2     16      1    98%
+============================= 30 passed in 0.84s ==============================
